@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HomeLab Integration Project Charter</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+      :root {
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --gradient-warning: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+        --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        --gradient-dark: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+
+        --primary: #667eea;
+        --secondary: #764ba2;
+        --success: #00d4aa;
+        --warning: #ff9f43;
+        --danger: #ee5a52;
+        --dark: #2f3542;
+        --light: #f1f2f6;
+        --white: #ffffff;
+
+        --text-primary: #2f3542;
+        --text-secondary: #57606f;
+        --text-muted: #8395a7;
+        --text-light: #a4b0be;
+
+        --shadow-soft: 0 2px 20px rgba(0, 0, 0, 0.08);
+        --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+        --shadow-strong: 0 15px 35px rgba(0, 0, 0, 0.15);
+        --shadow-colored: 0 8px 30px rgba(102, 126, 234, 0.2);
+
+        --border-radius: 16px;
+        --border-radius-small: 8px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        font-weight: 400;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+      }
+
+      /* Floating background elements */
+      .bg-decoration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      .bg-decoration::before,
+      .bg-decoration::after {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        filter: blur(100px);
+        animation: float 20s ease-in-out infinite;
+      }
+
+      .bg-decoration::before {
+        background: var(--gradient-primary);
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+
+      .bg-decoration::after {
+        background: var(--gradient-secondary);
+        bottom: 10%;
+        right: 10%;
+        animation-delay: 10s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(50px, -50px) scale(1.1);
+        }
+        66% {
+          transform: translate(-30px, 30px) scale(0.9);
+        }
+      }
+
+      /* Hero Header */
+      .hero {
+        text-align: center;
+        padding: 4rem 2rem 6rem;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(255, 255, 255, 0.8) 100%
+        );
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-strong);
+        margin-bottom: 4rem;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+      }
+
+      .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 3rem;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-success);
+        transform: scaleX(0);
+        transition: var(--transition);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-colored);
+      }
+
+      .stat-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+      }
+
+      .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.875rem;
+      }
+
+      /* Student Info Cards */
+      .student-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+      }
+
+      .info-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .info-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .info-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: var(--shadow-strong);
+      }
+
+      .info-card:hover::before {
+        opacity: 0.05;
+      }
+
+      .info-card-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .info-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      /* Section Cards */
+      .section {
+        background: rgba(255, 255, 255, 0.95);
+        margin-bottom: 3rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+        transition: var(--transition);
+      }
+
+      .section:hover {
+        box-shadow: var(--shadow-strong);
+      }
+
+      .section-header {
+        padding: 2rem 2rem 1rem;
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .section-title .emoji {
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        background: var(--gradient-primary);
+        border-radius: var(--border-radius-small);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .section-content {
+        padding: 2rem;
+      }
+
+      /* Enhanced Typography */
+      .subsection-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 2rem 0 1rem;
+        position: relative;
+        padding-left: 1rem;
+      }
+
+      .subsection-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+      }
+
+      .text-content {
+        font-size: 1.125rem;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+      }
+
+      /* Enhanced Lists */
+      .feature-list {
+        display: grid;
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+
+      .feature-item {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 1.5rem;
+        border-radius: var(--border-radius-small);
+        border-left: 4px solid transparent;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+      }
+
+      .feature-item:hover {
+        border-left-color: var(--primary);
+        transform: translateX(8px);
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: var(--shadow-soft);
+      }
+
+      /* Scope Toggle Cards */
+      .scope-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .scope-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        transition: var(--transition);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .scope-card.in-scope {
+        border-top: 4px solid var(--success);
+      }
+
+      .scope-card.roadmap {
+        border-top: 4px solid var(--warning);
+      }
+
+      .scope-card.out-of-scope {
+        border-top: 4px solid var(--danger);
+      }
+
+      .scope-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-strong);
+      }
+
+      .scope-header {
+        padding: 1.5rem;
+        background: rgba(248, 249, 250, 0.8);
+      }
+
+      .scope-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .scope-content {
+        padding: 0 1.5rem 1.5rem;
+      }
+
+      /* Enhanced Tables */
+      .table-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        margin: 2rem 0;
+        backdrop-filter: blur(20px);
+      }
+
+      .enhanced-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .enhanced-table th {
+        background: linear-gradient(
+          135deg,
+          var(--light) 0%,
+          rgba(248, 249, 250, 0.8) 100%
+        );
+        padding: 1.5rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+      }
+
+      .enhanced-table td {
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        transition: var(--transition);
+      }
+
+      .enhanced-table tr:hover td {
+        background: rgba(102, 126, 234, 0.05);
+      }
+
+      /* Priority Tags */
+      .priority-tag {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+      }
+
+      .priority-high {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .priority-medium {
+        background: linear-gradient(135deg, #f2994a, #f2c94c);
+        color: white;
+        box-shadow: 0 4px 15px rgba(242, 153, 74, 0.3);
+      }
+
+      .priority-low {
+        background: linear-gradient(135deg, #00d4aa, #01a085);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+      }
+
+      /* Enhanced Callouts */
+      .callout {
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin: 2rem 0;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .callout::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+      }
+
+      .callout.info {
+        background: linear-gradient(
+          135deg,
+          rgba(79, 172, 254, 0.1),
+          rgba(0, 242, 254, 0.1)
+        );
+      }
+
+      .callout.info::before {
+        background: var(--gradient-success);
+      }
+
+      .callout.success {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 212, 170, 0.1),
+          rgba(1, 160, 133, 0.1)
+        );
+      }
+
+      .callout.success::before {
+        background: linear-gradient(135deg, #00d4aa, #01a085);
+      }
+
+      .callout.warning {
+        background: linear-gradient(
+          135deg,
+          rgba(242, 153, 74, 0.1),
+          rgba(242, 201, 76, 0.1)
+        );
+      }
+
+      .callout.warning::before {
+        background: var(--gradient-warning);
+      }
+
+      .callout.danger {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 107, 107, 0.1),
+          rgba(238, 90, 36, 0.1)
+        );
+      }
+
+      .callout.danger::before {
+        background: var(--gradient-danger);
+      }
+
+      .callout-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .callout-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+      }
+
+      .callout-text {
+        flex: 1;
+        font-weight: 500;
+        line-height: 1.6;
+      }
+
+      /* Screenshot Gallery */
+      .screenshot-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .screenshot-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        transition: var(--transition);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .screenshot-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--shadow-strong);
+      }
+
+      .screenshot-header {
+        padding: 1rem;
+        background: rgba(248, 249, 250, 0.8);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .screenshot-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .screenshot-description {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .screenshot-image {
+        height: 80px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .screenshot-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+      }
+
+      .screenshot-image:hover img {
+        transform: scale(1.1);
+      }
+
+      .screenshot-image::after {
+        content: "🔍";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 50%;
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .screenshot-image:hover::after {
+        opacity: 1;
+      }
+
+      /* Image Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-strong);
+        animation: zoomIn 0.3s ease-out;
+      }
+
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        z-index: 1001;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+      }
+
+      .modal-close:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.1);
+      }
+
+      /* Image placeholders */
+      .image-placeholder {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px dashed var(--primary);
+        border-radius: var(--border-radius);
+        padding: 3rem 2rem;
+        text-align: center;
+        margin: 2rem 0;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+      }
+
+      .image-placeholder:hover {
+        border-color: var(--secondary);
+        background: rgba(255, 255, 255, 0.95);
+        transform: translateY(-2px);
+      }
+
+      .placeholder-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+      }
+
+      .placeholder-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .placeholder-description {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      /* Code styling */
+      .code-tag {
+        background: linear-gradient(
+          135deg,
+          var(--light),
+          rgba(248, 249, 250, 0.8)
+        );
+        color: var(--danger);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--border-radius-small);
+        font-family: "Monaco", "Menlo", monospace;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .scope-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .screenshot-gallery {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .hero {
+          padding: 2rem 1rem 3rem;
+        }
+
+        .hero-stats {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .student-info {
+          grid-template-columns: 1fr;
+        }
+
+        .section-content {
+          padding: 1rem;
+        }
+
+        .enhanced-table {
+          font-size: 0.875rem;
+        }
+
+        .enhanced-table th,
+        .enhanced-table td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+
+      /* Loading Animation */
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+        position: relative;
+      }
+
+      .loading::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid var(--primary);
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        transform: translate(-50%, -50%);
+      }
+
+      @keyframes spin {
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      /* Accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* Focus styles */
+      *:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      /* Print styles */
+      @media print {
+        .bg-decoration {
+          display: none;
+        }
+        .section {
+          break-inside: avoid;
+        }
+        .modal {
+          display: none !important;
+        }
+      }
+    </style>
+    <script>
+      function openModal(imageSrc) {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        modal.classList.add("show");
+        modalImg.src = imageSrc;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("imageModal");
+        modal.classList.remove("show");
+        document.body.style.overflow = "auto";
+      }
+
+      // Initialize when DOM loads
+      document.addEventListener("DOMContentLoaded", function () {
+        // Add intersection observer for animations
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: "0px 0px -50px 0px",
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animation = "slideUp 0.6s ease-out forwards";
+            }
+          });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll(".section").forEach((section) => {
+          observer.observe(section);
+        });
+
+        // Close modal on escape key
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeModal();
+        });
+      });
+
+      // Add slideUp animation
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+      document.head.appendChild(style);
+    </script>
+  </head>
+  <body>
+    <div class="bg-decoration"></div>
+
+    <div class="container">
+      <!-- Hero Section -->
+      <div class="hero">
+        <h1 class="hero-title">⚡ HomeLab Integration Project Charter</h1>
+        <p class="hero-subtitle">Cybersecurity & IT Systems Practice</p>
+
+        <!-- Student Info -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+          "
+        >
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.9);
+              padding: 1rem;
+              border-radius: var(--border-radius-small);
+              backdrop-filter: blur(10px);
+            "
+          >
+            <div
+              style="
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+              "
+            >
+              👩‍🎓 Student
+            </div>
+            <div style="font-weight: 600">Wendy Buonavita</div>
+          </div>
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.9);
+              padding: 1rem;
+              border-radius: var(--border-radius-small);
+              backdrop-filter: blur(10px);
+            "
+          >
+            <div
+              style="
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+              "
+            >
+              📚 Course
+            </div>
+            <div style="font-weight: 600">Managing IT Projects</div>
+          </div>
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.9);
+              padding: 1rem;
+              border-radius: var(--border-radius-small);
+              backdrop-filter: blur(10px);
+            "
+          >
+            <div
+              style="
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+              "
+            >
+              📅 Semester
+            </div>
+            <div style="font-weight: 600">Fall 2025</div>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-card">
+            <span class="stat-number">5</span>
+            <span class="stat-label">Major Deliverables</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">$1K</span>
+            <span class="stat-label">Total Budget</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">9</span>
+            <span class="stat-label">Key Tasks</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">10</span>
+            <span class="stat-label">Stakeholders</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Overview -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">📌</span>
+            Project Overview
+          </h2>
+        </div>
+        <div class="section-content">
+          <h3 class="subsection-title">
+            Homelab for Cybersecurity & IT Systems Practice
+          </h3>
+          <p class="text-content">
+            This project focuses on designing and building a personal Homelab
+            environment to gain hands-on experience with IT systems, networking,
+            and cybersecurity. The Homelab integrates smart home devices,
+            segmented networks, monitoring tools, and vulnerability labs to
+            simulate real-world scenarios in a safe, self-contained setup.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <strong>🎯 Academic Excellence:</strong> Strengthen technical
+              skills through practical application of classroom concepts
+            </div>
+            <div class="feature-item">
+              <strong>💼 Portfolio Development:</strong> Build a portfolio-ready
+              showcase of IT and cybersecurity capabilities
+            </div>
+            <div class="feature-item">
+              <strong>🔬 Experimentation Platform:</strong> Provide a flexible,
+              scalable testbed for experimenting with new tools and
+              configurations
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vision & Strategy -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">🌍</span>
+            Vision & Strategic Alignment
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="feature-list">
+            <div class="feature-item">
+              <strong>🎯 Mission (Present):</strong> Grow as an IT and
+              cybersecurity professional by building hands-on experience,
+              applying continuous learning, problem-solving, and documentation.
+            </div>
+            <div class="feature-item">
+              <strong>🔮 Vision (Future):</strong> Work in cybersecurity or IT
+              systems administration, using technical expertise to protect
+              organizations and improve system reliability — with a
+              portfolio-ready showcase of skills.
+            </div>
+            <div class="feature-item">
+              <strong>⚡ Strategic Alignment:</strong>
+              <ul style="margin-top: 0.5rem; margin-left: 1rem">
+                <li>
+                  <strong>Academic:</strong> Applies project management and IT
+                  knowledge from coursework
+                </li>
+                <li>
+                  <strong>Career:</strong> Produces portfolio-ready evidence of
+                  technical skills
+                </li>
+                <li>
+                  <strong>Personal:</strong> Builds a scalable home environment
+                  for ongoing experimentation
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Case -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">💼</span>
+            Business Case & Justification
+          </h2>
+        </div>
+        <div class="section-content">
+          <p class="text-content">
+            This Homelab directly advances both
+            <strong>academic and career goals</strong>:
+          </p>
+
+          <div class="feature-list">
+            <div class="feature-item">
+              <strong>🎓 Academic Value:</strong> Provides a practical project
+              to apply IT project management concepts, including scope,
+              stakeholders, dependencies, and deliverables
+            </div>
+            <div class="feature-item">
+              <strong>💼 Career Value:</strong> Creates a professional portfolio
+              artifact demonstrating cybersecurity, networking, and system
+              administration skills
+            </div>
+            <div class="feature-item">
+              <strong>👤 Personal Value:</strong> Improves technical competence
+              with real-world tools and environments in a low-risk, self-paced
+              setup
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Scope -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">📐</span>
+            Project Scope
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="scope-grid">
+            <div class="scope-card in-scope" id="scope-in">
+              <div class="scope-header">
+                <div class="scope-title">
+                  <span>✅</span>
+                  <strong>In Scope for Semester</strong>
+                </div>
+              </div>
+              <div class="scope-content">
+                <div class="feature-list">
+                  <div class="feature-item">
+                    Integrate at least one HomeKit smart device
+                    (light/thermostat)
+                  </div>
+                  <div class="feature-item">
+                    Configure a segmented test network with VLANs and at least 2
+                    VMs (firewall + client)
+                  </div>
+                  <div class="feature-item">
+                    Deploy a self-hosted Minecraft server with user access and
+                    backups
+                  </div>
+                  <div class="feature-item">
+                    Implement monitoring with Grafana, Prometheus, or Uptime
+                    Kuma
+                  </div>
+                  <div class="feature-item">
+                    Deploy a Vulnerability Lab (DVWA / Metasploit) and run a
+                    basic attack/defense exercise
+                  </div>
+                  <div class="feature-item">
+                    Document configurations, testing results, and lessons
+                    learned
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="scope-card roadmap" id="scope-roadmap">
+              <div class="scope-header">
+                <div class="scope-title">
+                  <span>📘</span>
+                  <strong>Roadmap Items (≤6 Months)</strong>
+                </div>
+              </div>
+              <div class="scope-content">
+                <div class="feature-list">
+                  <div class="feature-item">
+                    Add more smart home devices and expand automation
+                  </div>
+                  <div class="feature-item">
+                    Implement a SIEM tool for monitoring and logging
+                  </div>
+                  <div class="feature-item">
+                    Test additional intrusion detection/prevention tools
+                    (IDS/IPS)
+                  </div>
+                  <div class="feature-item">
+                    Experiment with cloud-hosted extensions (AWS, Azure)
+                  </div>
+                  <div class="feature-item">
+                    Create a portfolio write-up showcasing Homelab
+                    configurations
+                  </div>
+                  <div class="feature-item">
+                    Simulate more advanced attack/defense scenarios for deeper
+                    cybersecurity practice
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="scope-card out-of-scope" id="scope-out">
+              <div class="scope-header">
+                <div class="scope-title">
+                  <span>❌</span>
+                  <strong>Out of Scope</strong>
+                </div>
+              </div>
+              <div class="scope-content">
+                <div class="feature-list">
+                  <div class="feature-item">
+                    Full enterprise-level smart home or corporate network setup
+                  </div>
+                  <div class="feature-item">
+                    24/7 uptime or production-grade availability
+                  </div>
+                  <div class="feature-item">
+                    Advanced penetration testing on external networks
+                  </div>
+                  <div class="feature-item">
+                    Integration with unsupported or legacy devices
+                  </div>
+                  <div class="feature-item">
+                    Professional red-team/blue-team exercises requiring multiple
+                    participants
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stakeholder Register -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">👥</span>
+            Stakeholder Register
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="enhanced-table">
+              <thead>
+                <tr>
+                  <th>Stakeholder</th>
+                  <th>Category</th>
+                  <th>Power</th>
+                  <th>Interest</th>
+                  <th>Engagement Strategy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Wendy (Project Owner)</strong></td>
+                  <td>Internal</td>
+                  <td><span class="priority-tag priority-high">High</span></td>
+                  <td><span class="priority-tag priority-high">High</span></td>
+                  <td>
+                    Owns all tasks, manages daily progress, documents work
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Instructor (Professor)</strong></td>
+                  <td>Internal</td>
+                  <td><span class="priority-tag priority-high">High</span></td>
+                  <td>
+                    <span class="priority-tag priority-medium">Medium</span>
+                  </td>
+                  <td>
+                    Receives updates via assignments, ensures academic alignment
+                  </td>
+                </tr>
+                <tr>
+                  <td>Classmates/Peers</td>
+                  <td>Internal</td>
+                  <td><span class="priority-tag priority-low">Low</span></td>
+                  <td><span class="priority-tag priority-high">High</span></td>
+                  <td>Provide feedback and collaboration</td>
+                </tr>
+                <tr>
+                  <td>Family Members</td>
+                  <td>External</td>
+                  <td>
+                    <span class="priority-tag priority-medium">Medium</span>
+                  </td>
+                  <td><span class="priority-tag priority-low">Low</span></td>
+                  <td>
+                    Informed of network/device impacts, minimize disruption
+                  </td>
+                </tr>
+                <tr>
+                  <td>University IT Department</td>
+                  <td>Internal</td>
+                  <td>
+                    <span class="priority-tag priority-medium">Medium</span>
+                  </td>
+                  <td>
+                    <span class="priority-tag priority-medium">Medium</span>
+                  </td>
+                  <td>Engage if resources/permissions are needed</td>
+                </tr>
+                <tr>
+                  <td>Future Employers/Recruiters</td>
+                  <td>External</td>
+                  <td><span class="priority-tag priority-high">High</span></td>
+                  <td>
+                    <span class="priority-tag priority-medium">Medium</span>
+                  </td>
+                  <td>Showcase project in portfolio, LinkedIn, resume</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Power-Interest Grid -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">🔲</span>
+            Power–Interest Grid
+          </h2>
+        </div>
+        <div class="section-content">
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.95);
+              padding: 1rem;
+              border-radius: var(--border-radius);
+              box-shadow: var(--shadow-medium);
+              backdrop-filter: blur(20px);
+              text-align: center;
+            "
+          >
+            <h4
+              style="
+                margin-bottom: 1rem;
+                color: var(--text-primary);
+                font-weight: 600;
+              "
+            >
+              📊 Stakeholder Power-Interest Analysis
+            </h4>
+            <img
+              src="img/PIgrid.png"
+              alt="Power-Interest Grid showing stakeholder positioning based on their power and interest levels"
+              style="
+                max-width: 600px;
+                width: 100%;
+                height: auto;
+                border-radius: var(--border-radius-small);
+                cursor: pointer;
+                box-shadow: var(--shadow-soft);
+              "
+              onclick="openModal('img/PIgrid.png')"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Deliverables -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">📦</span>
+            Project Deliverables
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="enhanced-table">
+              <thead>
+                <tr>
+                  <th>Deliverable</th>
+                  <th>Type</th>
+                  <th>SMART Goal</th>
+                  <th>Definition of Done</th>
+                  <th>Target Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Apple HomeKit Smart Home Integration</strong></td>
+                  <td>Tangible</td>
+                  <td>
+                    Integrate at least one smart device into Apple HomeKit by
+                    Oct 15, 2025
+                  </td>
+                  <td>
+                    Device connected, remotely controllable, verified isolation
+                    from main network, screenshots documented
+                  </td>
+                  <td>Oct 15, 2025</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong
+                      >Cybersecurity Practice – Segmented Test
+                      Environment</strong
+                    >
+                  </td>
+                  <td>Tangible</td>
+                  <td>
+                    Configure a segmented network with at least 2 VMs (firewall
+                    + client) by Oct 22, 2025
+                  </td>
+                  <td>
+                    VMs deployed, VLAN segmentation tested, firewall rules
+                    documented, traffic flows validated
+                  </td>
+                  <td>Oct 22, 2025</td>
+                </tr>
+                <tr>
+                  <td><strong>Self-Hosted Minecraft Server</strong></td>
+                  <td>Tangible</td>
+                  <td>
+                    Deploy a functioning Minecraft server with user access and
+                    backup plan by Nov 1, 2025
+                  </td>
+                  <td>
+                    Server online, at least 1 external connection tested,
+                    configuration and troubleshooting documented
+                  </td>
+                  <td>Nov 1, 2025</td>
+                </tr>
+                <tr>
+                  <td><strong>Monitoring & Dashboard</strong></td>
+                  <td>Intangible</td>
+                  <td>Implement monitoring and dashboards by Nov 10, 2025</td>
+                  <td>
+                    Metrics collected, dashboards viewable, alerts configured,
+                    screenshots included
+                  </td>
+                  <td>Nov 10, 2025</td>
+                </tr>
+                <tr>
+                  <td><strong>Vulnerability Lab</strong></td>
+                  <td>Intangible</td>
+                  <td>
+                    Deploy at least one vulnerable application and run an
+                    attack/defense exercise by Nov 25, 2025
+                  </td>
+                  <td>
+                    Lab operational, vulnerabilities exploited/defended, lessons
+                    learned documented
+                  </td>
+                  <td>Nov 25, 2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks & Dependencies -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">📋</span>
+            Tasks & Dependencies
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="enhanced-table">
+              <thead>
+                <tr>
+                  <th>Task ID</th>
+                  <th>Task</th>
+                  <th>Duration</th>
+                  <th>Dependencies</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="code-tag">T1</span></td>
+                  <td>Research hardware/software needs</td>
+                  <td>2 days</td>
+                  <td>None</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T2</span></td>
+                  <td>Acquire/setup Mac Mini + networking gear</td>
+                  <td>2 days</td>
+                  <td>T1</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T3</span></td>
+                  <td>Configure segmented network (VLANs/VMs)</td>
+                  <td>4 days</td>
+                  <td>T2</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T4</span></td>
+                  <td>Install/configure HomeKit device</td>
+                  <td>2 days</td>
+                  <td>T2</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T5</span></td>
+                  <td>Deploy Minecraft server</td>
+                  <td>3 days</td>
+                  <td>T3</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T6</span></td>
+                  <td>Install/configure monitoring tools</td>
+                  <td>4 days</td>
+                  <td>T3</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T7</span></td>
+                  <td>Deploy Vulnerability Lab (DVWA, Metasploit)</td>
+                  <td>5 days</td>
+                  <td>T3</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T8</span></td>
+                  <td>Run cybersecurity practice/attack-defense scenarios</td>
+                  <td>4 days</td>
+                  <td>T7</td>
+                </tr>
+                <tr>
+                  <td><span class="code-tag">T9</span></td>
+                  <td>Documentation & report</td>
+                  <td>5 days</td>
+                  <td>T4–T8</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout danger">
+            <div class="callout-content">
+              <div class="callout-icon">⚡</div>
+              <div class="callout-text">
+                <strong>Critical Path:</strong> T1 → T2 → T3 → T7 → T8 → T9
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">💰</span>
+            Budget Estimation
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="table-container">
+            <table class="enhanced-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Estimated Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mac Mini (M2 base model)</td>
+                  <td>$600–700</td>
+                </tr>
+                <tr>
+                  <td>Networking gear (router, switch, cabling)</td>
+                  <td>$200</td>
+                </tr>
+                <tr>
+                  <td>Smart device (HomeKit light/thermostat)</td>
+                  <td>$50–100</td>
+                </tr>
+                <tr>
+                  <td>External HDD / backup storage</td>
+                  <td>$80</td>
+                </tr>
+                <tr>
+                  <td>Misc. software/subscriptions (domains, cloud credits)</td>
+                  <td>$100</td>
+                </tr>
+                <tr
+                  style="
+                    border-top: 3px solid var(--primary);
+                    background: rgba(102, 126, 234, 0.1);
+                  "
+                >
+                  <td><strong>Total Estimated Cost</strong></td>
+                  <td><strong>$1,000 ± 10%</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Items Needed -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">🆕</span>
+            New Items Needed
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="feature-list">
+            <div class="feature-item">
+              <strong>Mac Mini</strong> - Primary Homelab machine,
+              stakeholder-driven requirement
+            </div>
+            <div class="feature-item">
+              <strong>Networking gear</strong> - Switch/router with VLAN support
+            </div>
+            <div class="feature-item">
+              <strong>At least 1 HomeKit-compatible device</strong> - Smart
+              light/thermostat
+            </div>
+            <div class="feature-item">
+              <strong>External storage</strong> - For backups and VM snapshots
+            </div>
+            <div class="feature-item">
+              <strong>Optional cloud credits</strong> - AWS/Azure/GCP, learning
+              use only
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Methodology Diagrams -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">🗂</span>
+            Project Methodology Diagrams
+          </h2>
+        </div>
+        <div class="section-content">
+          <div style="display: grid; gap: 2rem">
+            <div
+              style="
+                background: rgba(255, 255, 255, 0.95);
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-medium);
+                backdrop-filter: blur(20px);
+              "
+            >
+              <h4
+                style="
+                  margin-bottom: 1rem;
+                  color: var(--text-primary);
+                  font-weight: 600;
+                "
+              >
+                📈 Project Timeline
+              </h4>
+              <img
+                src="img/homelab_timeline_final.png"
+                alt="Project timeline showing key milestones and phases"
+                style="
+                  width: 100%;
+                  border-radius: var(--border-radius-small);
+                  cursor: pointer;
+                "
+                onclick="openModal('img/homelab_timeline_final.png')"
+              />
+            </div>
+
+            <div
+              style="
+                background: rgba(255, 255, 255, 0.95);
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-medium);
+                backdrop-filter: blur(20px);
+              "
+            >
+              <h4
+                style="
+                  margin-bottom: 1rem;
+                  color: var(--text-primary);
+                  font-weight: 600;
+                "
+              >
+                🔄 Process Flowchart
+              </h4>
+              <img
+                src="img/homelab_flowchart_final.png"
+                alt="Process flowchart showing task dependencies and workflow"
+                style="
+                  width: 100%;
+                  border-radius: var(--border-radius-small);
+                  cursor: pointer;
+                "
+                onclick="openModal('img/homelab_flowchart_final.png')"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Methodology Explanation -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">📊</span>
+            Project Methodology
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="callout info">
+            <div class="callout-content">
+              <div class="callout-icon">⚙️</div>
+              <div class="callout-text">
+                <h4 style="margin-bottom: 1rem">
+                  <strong>Chosen Methodology: Hybrid – Iterative</strong>
+                </h4>
+                <div class="feature-list">
+                  <div class="feature-item">
+                    <strong>Why Hybrid?</strong> Some deliverables are clearly
+                    defined, others (like attack/defense practice) may evolve
+                  </div>
+                  <div class="feature-item">
+                    <strong>Why Iterative?</strong> Each deliverable can be
+                    built in a short cycle: plan → build → test → document →
+                    review
+                  </div>
+                  <div class="feature-item">
+                    <strong>Cadence:</strong> Multiple releases over the
+                    semester (each deliverable completed, tested, and
+                    documented)
+                  </div>
+                </div>
+                <p style="margin-top: 1rem; font-weight: 600">
+                  <strong>Justification:</strong> Predictive is too rigid, Agile
+                  too unstructured; Hybrid–Iterative balances structure with
+                  flexibility.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tool Selection -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="emoji">🛠</span>
+            Project Tool Selection
+          </h2>
+        </div>
+        <div class="section-content">
+          <div class="callout success">
+            <div class="callout-content">
+              <div class="callout-icon">🔧</div>
+              <div class="callout-text">
+                <h4 style="margin-bottom: 1rem">
+                  <strong>Primary Tool: Notion</strong>
+                </h4>
+                <div class="feature-list">
+                  <div class="feature-item">
+                    <strong>All-in-one workspace:</strong> Combines task
+                    management, notes, documentation, and timelines in one
+                    platform
+                  </div>
+                  <div class="feature-item">
+                    <strong>Kanban & Database Flexibility:</strong> Can create
+                    task boards (Backlog → In Progress → Testing → Done) and
+                    link tasks with deadlines
+                  </div>
+                  <div class="feature-item">
+                    <strong>Documentation-Friendly:</strong> Embed screenshots,
+                    configs, and notes directly with tasks
+                  </div>
+                  <div class="feature-item">
+                    <strong>Portfolio Value:</strong> Screenshots of Notion
+                    boards/pages look professional for class and LinkedIn
+                    portfolio use
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="subsection-title">📸 Notion Screenshots</h3>
+          <div class="screenshot-gallery">
+            <div class="screenshot-card">
+              <div class="screenshot-header">
+                <div class="screenshot-title">
+                  <span>📋</span>
+                  Board View
+                </div>
+                <div class="screenshot-description">
+                  Kanban-style task management
+                </div>
+              </div>
+              <div
+                class="screenshot-image"
+                onclick="openModal('img/board_view.jpg')"
+              >
+                <img src="img/board_view.jpg" alt="Notion board view" />
+              </div>
+            </div>
+
+            <div class="screenshot-card">
+              <div class="screenshot-header">
+                <div class="screenshot-title">
+                  <span>📅</span>
+                  Calendar View
+                </div>
+                <div class="screenshot-description">
+                  Timeline & deadline tracking
+                </div>
+              </div>
+              <div
+                class="screenshot-image"
+                onclick="openModal('img/calendar_view.jpg')"
+              >
+                <img src="img/calendar_view.jpg" alt="Notion calendar view" />
+              </div>
+            </div>
+
+            <div class="screenshot-card">
+              <div class="screenshot-header">
+                <div class="screenshot-title">
+                  <span>📊</span>
+                  Table View
+                </div>
+                <div class="screenshot-description">Database & properties</div>
+              </div>
+              <div
+                class="screenshot-image"
+                onclick="openModal('img/table_view.jpg')"
+              >
+                <img src="img/table_view.jpg" alt="Notion table view" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <img class="modal-content" id="modalImage" />
+    </div>
+  </body>
+</html>
